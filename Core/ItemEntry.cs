@@ -5,6 +5,7 @@ namespace SadChromaLib.Specialisations.Inventory;
 /// <summary>
 /// An object representing an item slot in a bag.
 /// </summary>
+[GlobalClass]
 public sealed partial class ItemEntry : RefCounted
 {
 	public StringName ItemId;
