@@ -8,9 +8,9 @@ namespace SadChromaLib.Specialisations.Inventory;
 /// </summary>
 public interface IUseableItemHandler
 {
-	bool ItemCloseOnUse(StringName itemId);
-	bool ItemIsUseable(Node user, StringName itemId, ItemBag bag);
-	void ItemUse(Node user, StringName itemId, ItemBag bag);
+	bool ItemCloseOnUse(string itemId);
+	bool ItemIsUseable(Node user, string itemId, ItemBag bag);
+	void ItemUse(Node user, string itemId, ItemBag bag);
 }
 
 /// <summary>
@@ -19,7 +19,7 @@ public interface IUseableItemHandler
 [AttributeUsage(AttributeTargets.Class)]
 public class BindItemUseabilityTag : Attribute
 {
-	public StringName Tag;
+	public string Tag;
 
 	public BindItemUseabilityTag(string tag)
 	{

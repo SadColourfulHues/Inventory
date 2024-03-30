@@ -10,7 +10,7 @@ public sealed partial class LootBag : Resource
 	[Export]
 	private LootEntry[] _lootItems;
 
-	private WeightedBag<StringName> _bag;
+	private WeightedBag<string> _bag;
 
 	#region Main Functions
 
@@ -18,7 +18,7 @@ public sealed partial class LootBag : Resource
 	/// Picks a random item from this bag's loot pool
 	/// </summary>
 	/// <returns></returns>
-	public StringName GetLoot()
+	public string GetLoot()
 	{
 		InitialiseBag();
 		return _bag.Pick();
@@ -38,7 +38,7 @@ public sealed partial class LootBag : Resource
 		int roll = RandomUtils.BasicInt() % rolls;
 
 		for (int i = 0; i < roll; ++ i) {
-			StringName itemId = _bag.Pick();
+			string itemId = _bag.Pick();
 			int count = (int) RandomUtils.RangeLong(minAmount, maxAmount);
 
 			itemBag.GiveItem(itemId, count);

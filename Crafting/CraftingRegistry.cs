@@ -6,12 +6,12 @@ using System.Collections.Generic;
 namespace SadChromaLib.Specialisations.Inventory.Crafting;
 
 [GlobalClass]
-public sealed partial class CraftingRegistry : Resource
+public sealed partial class CraftingRegistry: Resource
 {
 	[Export]
 	private CraftRecipeDefinition[] _recipes;
 
-	private readonly HashSet<StringName> _unlockedRecipes;
+	private readonly HashSet<string> _unlockedRecipes;
 
 	public CraftingRegistry()
 	{
@@ -23,7 +23,7 @@ public sealed partial class CraftingRegistry : Resource
 	/// </summary>
 	/// <param name="outputId">The associated item ID</param>
 	/// <returns></returns>
-	public CraftRecipeDefinition GetDefinition(StringName outputId)
+	public CraftRecipeDefinition GetDefinition(string outputId)
 	{
 		ReadOnlySpan<CraftRecipeDefinition> recipes = _recipes;
 
@@ -62,7 +62,7 @@ public sealed partial class CraftingRegistry : Resource
 			.ToArray();
 	}
 
-	public void UnlockRecipe(StringName recipeId)
+	public void UnlockRecipe(string recipeId)
 	{
 		_unlockedRecipes.Add(recipeId);
 	}

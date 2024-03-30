@@ -9,7 +9,7 @@ namespace SadChromaLib.Specialisations.Inventory;
 public sealed partial class ItemDefinition: Resource
 {
 	[Export]
-	public StringName ItemId;
+	public string ItemId;
 
 	[Export]
 	public string DisplayName;
@@ -27,7 +27,7 @@ public sealed partial class ItemDefinition: Resource
 	public bool IsUseable;
 
 	[Export]
-	public StringName UseableItemTag;
+	public string UseableItemTag;
 
 	[Export(PropertyHint.MultilineText)]
 	public string ItemDescription;

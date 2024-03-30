@@ -17,7 +17,7 @@ public sealed partial class ItemRegistry: Resource
 		_definitions = definitions;
 	}
 
-	public bool IsValid(StringName id)
+	public bool IsValid(string id)
 	{
 		System.ReadOnlySpan<ItemDefinition> definitions = _definitions;
 
@@ -32,7 +32,7 @@ public sealed partial class ItemRegistry: Resource
 		return false;
 	}
 
-	public ItemDefinition GetDefinition(StringName id)
+	public ItemDefinition GetDefinition(string id)
 	{
 		System.ReadOnlySpan<ItemDefinition> definitions = _definitions;
 

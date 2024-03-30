@@ -10,10 +10,10 @@ namespace SadChromaLib.Specialisations.Inventory.Crafting;
 public sealed partial class CraftRecipeDefinition : Resource
 {
 	[Export]
-	public StringName CraftId;
+	public string CraftId;
 
 	[Export]
-	public StringName ResultingItemId;
+	public string ResultingItemId;
 
 	[Export]
 	public CraftRecipeIngredient[] Ingredients;

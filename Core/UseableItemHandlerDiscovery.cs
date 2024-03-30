@@ -10,7 +10,7 @@ namespace SadChromaLib.Specialisations.Inventory;
 /// </summary>
 public sealed partial class UseableItemHandlerDiscovery: RefCounted
 {
-	private readonly Dictionary<StringName, IUseableItemHandler> _handlers;
+	private readonly Dictionary<string, IUseableItemHandler> _handlers;
 
 	public UseableItemHandlerDiscovery()
 	{
@@ -27,7 +27,7 @@ public sealed partial class UseableItemHandlerDiscovery: RefCounted
 	/// <param name="bag">A reference to the item bag holding the item.</param>
 	/// <returns></returns>
 	public (bool useSuccess, bool closeOnUse)
-	ExecHandlerForType(StringName useableTag, StringName itemId, Node owner, ItemBag bag)
+	ExecHandlerForType(string useableTag, string itemId, Node owner, ItemBag bag)
 	{
 		if (!_handlers.ContainsKey(useableTag))
 			return (false, false);

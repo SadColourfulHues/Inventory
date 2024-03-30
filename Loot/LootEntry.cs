@@ -5,10 +5,10 @@ using SadChromaLib.Utils.Random;
 namespace SadChromaLib.Specialisations.Inventory.Loot;
 
 [GlobalClass]
-public sealed partial class LootEntry : Resource, IWeightedObject<StringName>
+public sealed partial class LootEntry : Resource, IWeightedObject<string>
 {
 	[Export]
-	public StringName ItemId;
+	public string ItemId;
 
 	[Export(PropertyHint.Range, "0.0,200.0")]
 	public float DropChance = 50f;
@@ -17,7 +17,7 @@ public sealed partial class LootEntry : Resource, IWeightedObject<StringName>
 
 	#region Weighted Object
 
-	public StringName GetValue()
+	public string GetValue()
 	{
 		return ItemId;
 	}

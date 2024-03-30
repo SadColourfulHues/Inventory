@@ -9,7 +9,7 @@ namespace SadChromaLib.Specialisations.Inventory.Crafting;
 public sealed partial class CraftRecipeIngredient: Resource
 {
 	[Export]
-	public StringName ItemId;
+	public string ItemId;
 
 	[Export]
 	public int Count = 1;

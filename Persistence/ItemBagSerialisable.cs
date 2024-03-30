@@ -1,64 +1,54 @@
-using Godot;
-using Godot.Collections;
+using System;
+using System.Diagnostics;
 
 using SadChromaLib.Persistence;
 
 namespace SadChromaLib.Specialisations.Inventory;
 
-using SerialisedData = Dictionary<StringName, Variant>;
-
-public sealed partial class ItemBag : ISerialisable
+public sealed partial class ItemBag: ISerialisable
 {
-	private static StringName KeyItemId => "id";
-	private static StringName KeyItemCount => "qty";
-
 	public string SerialisableGetFilename()
-		=> $"bag_{_persistentFilename}.json";
+		=> $"bag_{_persistentFilename}";
 
-	public void SerialisableWrite(FileAccess fileRef)
+	public void SerialisableWrite(PersistenceWriter writer)
 	{
-		Array<SerialisedData> data = new();
-		data.Resize(MaxCapacity);
+		ReadOnlySpan<ItemEntry> items = _items.AsSpan();
+		writer.Write(MaxCapacity);
 
-		for (int i = 0; i < MaxCapacity; ++ i) {
-			if (_items[i] == null) {
-				data[i] = null;
+		for (int i = 0; i < items.Length; ++i) {
+			if (items[i] is null) {
+				writer.Write(false);
 				continue;
 			}
 
-			data[i] = new() {
-				[KeyItemId] = _items[i].ItemId,
-				[KeyItemCount] = _items[i].Count
-			};
+			writer.Write(true);
+			writer.Write(items[i].ItemId);
+			writer.Write(items[i].Count);
 		}
-
-		fileRef.StoreString(Json.Stringify(data));
-		fileRef.Close();
 	}
 
-	public void SerialisableRead(string serialisedData)
+	public void SerialisableRead(PersistenceReader reader)
 	{
-		Array<SerialisedData> data = (Array<SerialisedData>) Json.ParseString(serialisedData);
+		int capacity = reader.ReadInt();
 
-		if (data.Count != MaxCapacity) {
-			GD.PrintErr("ItemBag: max capacity mistmatch in serialised data.");
-			return;
-		}
+		Debug.Assert(
+			condition: capacity <= MaxCapacity,
+			message: "ItemBag: Deserialisation failed => capacity mismatch"
+		);
 
-		for (int i = 0; i < data.Count; ++ i) {
-			if (data[i] == null ||
-				data[i].Count < 1)
-			{
+		for (int i = 0; i < capacity; ++ i) {
+			if (!reader.ReadBool()) {
 				_items[i] = null;
 				continue;
 			}
 
-			SerialisedData itemData = data[i];
-
 			_items[i] = new() {
-				ItemId = (StringName) itemData[KeyItemId],
-				Count = (int) itemData[KeyItemCount]
+				ItemId = reader.ReadString(),
+				Count = reader.ReadInt()
 			};
 		}
+
+		EmitSignal(SignalName.Changed);
+		EmitChanged();
 	}
 }

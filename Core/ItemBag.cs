@@ -149,7 +149,7 @@ public sealed partial class ItemBag: Resource
 	/// </summary>
 	/// <param name="other">The item bag to receive the items.</param>
 	/// <param name="filter">A method used to exclude certain items from the transfer.</param>
-	public void Transfer(ItemBag other, Func<StringName, bool> filter = null)
+	public void Transfer(ItemBag other, Func<string, bool> filter = null)
 	{
 		for (int i = 0; i < MaxCapacity; ++ i) {
 			if (_items[i] == null ||
@@ -213,7 +213,7 @@ public sealed partial class ItemBag: Resource
 	/// </summary>
 	/// <param name="source">The bag to take items from.</param>
 	/// <param name="filter">A method used to exclude certain items from the transfer.</param>
-	public void Restock(ItemBag source, Func<StringName, bool> filter = null)
+	public void Restock(ItemBag source, Func<string, bool> filter = null)
 	{
 		for (int i = 0; i < MaxCapacity; ++ i) {
 			if (_items[i] == null)
@@ -255,7 +255,7 @@ public sealed partial class ItemBag: Resource
 	/// <param name="itemId">The ID of the item to give.</param>
 	/// <param name="count">The amount of items to give. (Must be positive!)</param>
 	/// <returns></returns>
-	public bool GiveItem(StringName itemId, int count)
+	public bool GiveItem(string itemId, int count)
 	{
 		ItemDefinition itemDef = _registry.GetDefinition(itemId);
 		AssertOperation(itemDef, count);
@@ -296,7 +296,7 @@ public sealed partial class ItemBag: Resource
 	/// <param name="itemId">The ID of the item to remove.</param>
 	/// <param name="count">The amount of items to take. (Must be positive!)</param>
 	/// <returns></returns>
-	public bool TakeItem(StringName itemId, int count)
+	public bool TakeItem(string itemId, int count)
 	{
 		ItemDefinition itemDef = _registry.GetDefinition(itemId);
 		AssertOperation(itemDef, count);
@@ -328,7 +328,7 @@ public sealed partial class ItemBag: Resource
 	/// <param name="id">The item's associated ID.</param>
 	/// <param name="count">The amount to give/take.</param>
 	/// <returns></returns>
-	public bool GiveOrTakeItem(StringName id, int count)
+	public bool GiveOrTakeItem(string id, int count)
 	{
 		int actualCount = Math.Abs(count);
 
@@ -343,7 +343,7 @@ public sealed partial class ItemBag: Resource
 	/// <param name="itemId">The ID of the item to check for.</param>
 	/// <param name="count">The minimum amount of items.</param>
 	/// <returns></returns>
-	public bool HasItem(StringName itemId, int count = 1)
+	public bool HasItem(string itemId, int count = 1)
 	{
 		ItemDefinition itemDef = _registry.GetDefinition(itemId);
 		ItemEntry entry = FindItem(itemId).Item1;
@@ -386,7 +386,7 @@ public sealed partial class ItemBag: Resource
 	/// </summary>
 	/// <param name="itemId">The item ID.</param>
 	/// <returns></returns>
-	public ItemEntry GetItemWithId(StringName itemId)
+	public ItemEntry GetItemWithId(string itemId)
 	{
 		int slot = GetSlotForItemId(itemId);
 
@@ -401,7 +401,7 @@ public sealed partial class ItemBag: Resource
 	/// </summary>
 	/// <param name="itemId"></param>
 	/// <returns></returns>
-	public int GetSlotForItemId(StringName itemId)
+	public int GetSlotForItemId(string itemId)
 	{
 		for (int i = 0; i < MaxCapacity; ++ i) {
 			if (_items[i] == null ||
@@ -482,7 +482,7 @@ public sealed partial class ItemBag: Resource
 		return null;
 	}
 
-	private (ItemEntry, int) FindItem(StringName itemId)
+	private (ItemEntry, int) FindItem(string itemId)
 	{
 		for (int i = 0; i < MaxCapacity; ++ i) {
 			if (_items[i] == null ||
