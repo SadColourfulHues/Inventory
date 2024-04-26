@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Godot;
 
 using System;
+using System.Runtime.CompilerServices;
 
 namespace SadChromaLib.Specialisations.Inventory;
 
@@ -11,8 +12,8 @@ namespace SadChromaLib.Specialisations.Inventory;
 [GlobalClass]
 public sealed partial class ItemBag: Resource
 {
-	[Signal]
-	public delegate void ItemsChangedEventHandler(ItemBag bagRef);
+	public delegate void ItemsChangedCallback(ItemBag bagRef);
+	public event ItemsChangedCallback OnItemsChanged;
 
 	[Export]
 	private ItemRegistry _registry;
@@ -24,12 +25,11 @@ public sealed partial class ItemBag: Resource
 	public int MaxCapacity = 24;
 
 	[Export]
-	private string _persistentFilename = "bag";
+	string _persistentFilename = "bag";
 
-	private readonly ItemEntry[] _items;
+	readonly ItemEntry[] _items;
 
-	public ItemBag()
-	{
+	public ItemBag() {
 		_items = new ItemEntry[MaxCapacity];
 	}
 
@@ -66,10 +66,10 @@ public sealed partial class ItemBag: Resource
 			message: "ItemBag.Copy: size mismatch"
 		);
 
-		ReadOnlySpan<ItemEntry> other = source._items;
+		ReadOnlySpan<ItemEntry> other = source._items.AsSpan();
 
 		for (int i = 0; i < MaxCapacity; ++ i) {
-			if (other[i] == null) {
+			if (other[i] is null) {
 				_items[i] = null;
 				continue;
 			}
@@ -94,12 +94,12 @@ public sealed partial class ItemBag: Resource
 	{
 		ItemEntry item = _items[slot];
 
-		if (item == null)
+		if (item is null)
 			return false;
 
 		ItemDefinition itemDef = _registry.GetDefinition(item.ItemId);
 
-		if (itemDef == null)
+		if (itemDef is null)
 			return false;
 
 		int otherItemSlot = other.GetSlotForItemId(item.ItemId);
@@ -122,7 +122,7 @@ public sealed partial class ItemBag: Resource
 		if (totalCount <= itemDef.MaxAmount) {
 			int? openSlot = other.FindOpenSlot();
 
-			if (openSlot == null)
+			if (openSlot is null)
 				return false;
 
 			other._items[openSlot.Value] = item;
@@ -152,7 +152,7 @@ public sealed partial class ItemBag: Resource
 	public void Transfer(ItemBag other, Func<string, bool> filter = null)
 	{
 		for (int i = 0; i < MaxCapacity; ++ i) {
-			if (_items[i] == null ||
+			if (_items[i] is null ||
 				(filter?.Invoke(_items[i].ItemId) ?? false))
 			{
 				continue;
@@ -163,7 +163,7 @@ public sealed partial class ItemBag: Resource
 			if (slotInOther.Value == -1) {
 				slotInOther = other.FindOpenSlot();
 
-				if (slotInOther == null)
+				if (slotInOther is null)
 					return;
 
 				other._items[slotInOther.Value] = _items[i];
@@ -178,7 +178,7 @@ public sealed partial class ItemBag: Resource
 					continue;
 				}
 
-				if (itemDef == null)
+				if (itemDef is null)
 					continue;
 
 				ItemEntry otherItem = other._items[slotInOther.Value];
@@ -216,13 +216,13 @@ public sealed partial class ItemBag: Resource
 	public void Restock(ItemBag source, Func<string, bool> filter = null)
 	{
 		for (int i = 0; i < MaxCapacity; ++ i) {
-			if (_items[i] == null)
+			if (_items[i] is null)
 				continue;
 
 			ItemDefinition itemDef = _registry.GetDefinition(_items[i].ItemId);
 			int slotInSource = source.GetSlotForItemId(itemDef.ItemId);
 
-			if (itemDef == null || slotInSource == -1)
+			if (itemDef is null || slotInSource == -1)
 				continue;
 
 			if (filter?.Invoke(itemDef.ItemId) ?? false)
@@ -258,7 +258,10 @@ public sealed partial class ItemBag: Resource
 	public bool GiveItem(string itemId, int count)
 	{
 		ItemDefinition itemDef = _registry.GetDefinition(itemId);
+
+		#if TOOLS
 		AssertOperation(itemDef, count);
+		#endif
 
 		ItemEntry entry = FindItem(itemId).Item1;
 
@@ -299,7 +302,10 @@ public sealed partial class ItemBag: Resource
 	public bool TakeItem(string itemId, int count)
 	{
 		ItemDefinition itemDef = _registry.GetDefinition(itemId);
+
+		#if TOOLS
 		AssertOperation(itemDef, count);
+		#endif
 
 		(ItemEntry, int) slotInfo = FindItem(itemId);
 
@@ -308,7 +314,7 @@ public sealed partial class ItemBag: Resource
 
 		// You can't taketh what doesn't existeth
 		// ... it's 12:00 in the morning, okay?
-		if (entry == null || entry.Count < count)
+		if (entry is null || entry.Count < count)
 			return false;
 
 		// Automatically remove empty item entries from the bag
@@ -328,6 +334,7 @@ public sealed partial class ItemBag: Resource
 	/// <param name="id">The item's associated ID.</param>
 	/// <param name="count">The amount to give/take.</param>
 	/// <returns></returns>
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public bool GiveOrTakeItem(string id, int count)
 	{
 		int actualCount = Math.Abs(count);
@@ -348,17 +355,16 @@ public sealed partial class ItemBag: Resource
 		ItemDefinition itemDef = _registry.GetDefinition(itemId);
 		ItemEntry entry = FindItem(itemId).Item1;
 
-		Debug.Assert(itemDef != null, "Invalid itemID!");
+		Debug.Assert(itemDef is not null, "Invalid itemID!");
 
-		return entry != null && entry.Count >= count;
+		return entry is not null && entry.Count >= count;
 	}
 
 	/// <summary>
 	/// Overrides the item bag's registry. (Typically used for testing and/or debugging.)
 	/// </summary>
 	/// <param name="registry"></param>
-	public void SetRegistryOverride(ItemRegistry registry)
-	{
+	public void SetRegistryOverride(ItemRegistry registry) {
 		_registry = registry;
 	}
 
@@ -404,7 +410,7 @@ public sealed partial class ItemBag: Resource
 	public int GetSlotForItemId(string itemId)
 	{
 		for (int i = 0; i < MaxCapacity; ++ i) {
-			if (_items[i] == null ||
+			if (_items[i] is null ||
 				_items[i].ItemId != itemId)
 			{
 				continue;
@@ -463,9 +469,8 @@ public sealed partial class ItemBag: Resource
 	/// Whether or not the item bag could hold more new items.
 	/// </summary>
 	/// <returns></returns>
-	public bool IsFull()
-	{
-		return FindOpenSlot() == null;
+	public bool IsFull() {
+		return FindOpenSlot() is null;
 	}
 
 	private int? FindOpenSlot()
@@ -473,7 +478,7 @@ public sealed partial class ItemBag: Resource
 		ReadOnlySpan<ItemEntry> items = _items;
 
 		for (int i = 0; i < MaxCapacity; ++ i) {
-			if (items[i] != null)
+			if (items[i] is not null)
 				continue;
 
 			return i;
@@ -485,7 +490,7 @@ public sealed partial class ItemBag: Resource
 	private (ItemEntry, int) FindItem(string itemId)
 	{
 		for (int i = 0; i < MaxCapacity; ++ i) {
-			if (_items[i] == null ||
+			if (_items[i] is null ||
 				_items[i].ItemId != itemId)
 			{
 				continue;
@@ -501,17 +506,21 @@ public sealed partial class ItemBag: Resource
 
 	#region Helpers
 
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	private void EmitChangedSignal()
 	{
-		EmitSignal(SignalName.ItemsChanged, this);
+		OnItemsChanged?.Invoke(this);
 		EmitChanged();
 	}
 
+	#if TOOLS
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	private static void AssertOperation(ItemDefinition itemDef, int count)
 	{
-		Debug.Assert(itemDef != null, "Invalid itemID!");
+		Debug.Assert(itemDef is not null, "Invalid itemID!");
 		Debug.Assert(count >= 0, "Tried to use a negative count in an unsigned operation.");
 	}
+	#endif
 
 	#endregion
 }
