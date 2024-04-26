@@ -6,6 +6,9 @@ namespace SadChromaLib.Specialisations.Inventory;
 /// A resource describing an item
 /// </summary>
 [GlobalClass]
+#if TOOLS
+[Tool]
+#endif
 public sealed partial class ItemDefinition: Resource
 {
 	[Export]
@@ -36,4 +39,15 @@ public sealed partial class ItemDefinition: Resource
 	{
 		return ResourceLoader.Load<Texture2D>(IconPath);
 	}
+
+	#if TOOLS
+	public override void _ValidateProperty(Godot.Collections.Dictionary _)
+	{
+		if (!Engine.IsEditorHint())
+			return;
+
+		ResourceName = $"{DisplayName ?? "Item Name"} ({ItemId ?? "<invalid id>"})";
+		EmitChanged();
+	}
+	#endif
 }
