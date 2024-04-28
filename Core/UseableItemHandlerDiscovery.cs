@@ -8,7 +8,7 @@ namespace SadChromaLib.Specialisations.Inventory;
 /// <summary>
 /// An organiser responsible for finding and running useable item handlers.
 /// </summary>
-public sealed partial class UseableItemHandlerDiscovery: RefCounted
+public sealed partial class UseableItemHandlerDiscovery
 {
 	private readonly Dictionary<string, IUseableItemHandler> _handlers;
 

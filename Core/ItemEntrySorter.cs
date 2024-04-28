@@ -6,7 +6,7 @@ namespace SadChromaLib.Specialisations.Inventory;
 /// <summary>
 /// A helper class that implements an object comparer for ItemBag's sorting mechanism
 /// </summary>
-public sealed partial class ItemEntryComparer : RefCounted, IComparer<ItemEntry>
+public sealed partial class ItemEntryComparer: IComparer<ItemEntry>
 {
 	private ItemRegistry _registryRef;
 	private Mode _sortMode;
